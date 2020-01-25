@@ -1,0 +1,65 @@
+1.-
+a) F. Es cierto que usar la comunicación serie facilita que el protocolo que se implemente sea full-duplex ya que solo hay que añadir una línea más para conseguir la comunicación bidireccional simultánea pero un protocolo de comunicación serie no tiene por qué ser full-duplex. Por ejemplo, el protocolo USB 2.0 es serie y no es full dúplex. Lo mismo se aplica para el caso contrario: no todos los protocolos paralelos tienen por qué ser half-duplex.
+b) V. Por ejemplo, el procesador que aparece a la izquierda en la transparencia 54 del tema 2 realiza las funciones de puente norte.
+c) F. La garantía de realización de los pagos debe aparecer en el pliego de cláusulas administrativas particulares. Lo que sí puede aparecer en el pliego de prescripciones técnicas es la garantía de los componentes ante un defecto de los mismos.
+d) V. Segundo párrafo de la transparencia 40 del tema 5. Hay que tener claro aquí la definición de carga (transparencia 6 del tema 3): "conjunto de tareas que ha de realizar un sistema". Es evidente que según el tipo se tareas que tenga que realizar un servidor, un componente determinado puede o no ser cuello de botella.
+e) F. Lo correcto sería: R0=V1*R1+V2*R2+…+Vk*Rk.
+f) F. Se llama SAS.
+g) F. Lo que será menor será el tiempo medio de servicio.
+h) F. Transparencia 33 del tema 5. Obtendríamos Qi=lambdai*Wi.
+i) F. Transparencias 26 y 30 del tema 4. El índice SPEC es una media geométrica de ganancias en velocidad con respecto a una máquina de referencia. Si una ganancia concreta es menor que 1 es que la máquina es más lenta que la máquina de referencia para ese caso. Luego un SPEC menor que 1 nunca puede implicar que la máquina sea más rápida que la de referencia.
+j) F. Para obtener la media aritmética de los tiempos de ejecución no necesitamos para nada una máquina de referencia (transparencia 42 del tema 4).
+k) F. Es una HIPÓTESIS adicional que hacemos en la transparencia 66 para resolver una red de colas abierta pero no es una ley del análisis operacional.
+l) F. Lo que no puede ser superior a 1/Db es la productividad media del servidor. La tasa de llegada no la controlamos nosotros y puede ser todo lo alta que quieran nuestros clientes.
+m) F. Una red de colas cerrada, mientras que tengamos un tamaño suficientemente grande de las colas de cada dispositivo, NUNCA SE SATURA ya que el número total de clientes en la red de colas cerrada (NT), por muy grande que sea, es un valor fijo.
+n) F. El nivel de confianza seleccionado determinará el grado de significatividad y, por tanto, el umbral con respecto al cual comparar el valor-p, pero el valor-p propiamente dicho no depende del nivel de confianza. Por ejemplo, ver el ejercicio 4.15 que se hizo en clase.
+o) F. Es al revés. En el ejercicio 4.15 (que se hizo en clase) se discutió esto. A mayor nivel de confianza, menor grado de significatividad (alfa). El valor-p se puede ver esencialmente como la probabilidad de que H0 sea cierta. Al bajar el grado de significatividad, es más difícil conseguir que el valor-p < alfa, por tanto, más difícil descartar la hipótesis nula (H0) de que ambas alternativas son equivalentes.
+
+2.- Un ejercicio muy parecido al que hicimos en las transparencias 30 y 31 del tema 3. Para el apartado a) también ver la transparencia 13 del tema 3.
+a) Sobrecarga de tiempo de cómputo = sobrecarga de CPU.
+A partir del enunciado (hora de la última escritura diaria en los ficheros sa01 y sa02) y el conocimiento de la herramienta sar, se debe deducir que el monitor se activa cada 15 minutos = 900s. Por lo tanto:
+Sobrecarga_CPU(%) = (0,7s / 900s)*100 = 0,078%.
+b) Transparencia 12 del tema 3. Anchura de Entrada (Input Width): ¿Cuánta información (nº de bytes de datos) se almacena por cada medida que toma el monitor?
+Si el monitor se activa cada 15 minutos, se activará 4 veces cada hora y, por tanto, 4*24 = 96 veces al día (desde las 0:00 de ese día hasta las 23:45). El tamaño de los ficheros sa01 y sa02 que son los dos completos que hay es 196608 bytes. Por tanto, de media, cada activación del monitor almacena 196608/96= 2048 bytes de datos.
+
+3.- Un ejercicio casi idéntico a éste se hizo en clase (ejercicio 1.13). Pongo una de las posibles formas de resolverlo:
+Del enunciado del ejercicio es fácil deducir que las PRESTACIONES DEL SISTEMA con la CPU nueva deben ser, como mínimo, el triple que con la CPU antigua. De ahí, se debe deducir que la ganancia en velocidad que se obtendría al sustituir la CPU antigua por la nueva debería ser >=3. Por tanto:
+S = 1/(1-f+f/k) >= 3. De donde k>=6. La CPU nueva debe ser, como mínimo, 6 veces más rápida que la antigua.
+
+4.-
+a) En un protocolo paralelo, al enviarse la información a través de varias líneas a lo largo de la placa, no todas ellas recorren la misma distancia hasta llegar al destino por lo que no todas las señales llegan a la vez. Eso dificulta poder subir la frecuencia de la señal de reloj (que es la que marca cuándo se debe leer el dato) ya que debemos esperar a que todas las señales lleguen al destino antes de leer la palabra completa ("timing skew"). Esto no pasa con los protocolos serie ya que en ellos el número de líneas necesarias para la comunicación se reduce al mínimo posible y suelen incorporar el propio reloj embebido con los datos.
+b) Son conectores SATA o SAS (o e-SATA). Sirven para conectar a la placa unidades de almacenamiento permanente como pueden ser discos duros, unidades de estado sólido, discos ópticos o unidades de cinta magnética.
+c) Transparencia 68 del tema 4. Factor: Cada una de las variables que pueden afectar a la variable respuesta. Nivel: Cada uno de los valores que puede asumir un factor.
+d) Transparencias 31 y 32 del tema 4. Macrobenchmarks o benchmarks de sistema completo para servidores de comercio electrónico y con bases de datos. Algunos, en lugar de contestar esto, han descrito los benchmarks TPC-C, TPC-E, TPC-H y TPC-DS. También sería correcto.
+e) Transparencia 44 del tema 2 (la parte de arriba).
+f) Transparencia 22. Esto no tiene NADA que ver con el hecho de que sea volátil. Al ser cada celda de memoria DRAM esencialmente un condensador, éste se descarga con el tiempo y hay que volver a escribir su contenido (refrescarlo) cada cierto tiempo.
+g) Transparencia 37 del tema 2. No todos los bits que se transmiten son de información. Al usar codificación 8b/10b, 2 de cada 10 bits son de overhead para asegurar la fiabilidad de la transmisión. Por esto, con una frecuencia de reloj de 6GHz (=6 Giga transferencias por segundo) solo se consigue un ancho de banda de información de 600MBps.
+h) Programa de simulación de ensamblaje de un PC que vimos en clase. La cola o pasta térmica se usa principalmente para TRANSMITIR el calor de la CPU al disipador que se coloca encima de él (ya que transmite el calor de forma mucho más eficiente que el aire). Por tanto, la cola propiamente dicha NO ABSORBE O DISIPA el calor.
+i) Transparencia 7 del tema 6. Licitante es el que participa en una licitación ofreciendo la ejecución de un servicio a cambio de la obtención de dinero u otros beneficios mientras que el contratista es el licitante que resulta adjudicatario de la licitación (=el que la gana) y quien finalmente se encargará de llevar a cabo los trabajos contratados.
+j) Transparencias 23 y 24 del tema 1.
+k) Transparencias 44 y 51 del tema 3. Algunas de las diferencias más claras son:
+Gprof necesita instrumentar el programa (necesita compilar el fuente del programa a perfilar con ciertas opciones de profiling) y perf no.
+Perf puede usar tanto eventos hw como sw para detener el estado de ejecución del sistema y medir. Sin embargo, gprof solo usa un único evento sw que es el temporizador de profiling del S.O. (medimos por dónde va la ejecución del programa cada cierto tiempo de ejecución de CPU del mismo).
+l) La fuente de alimentación convierte corriente alterna en continua. Suministra valores "fijos" de continua de 0, 3,3, 5V y 12V, esencialmente. Sin embargo, tanto la CPU como la memoria DRAM y el chipset necesitan voltajes más bajos y, sobre todo, una estabilidad en la señal que no es capaz de asegurar la fuente de alimentación: al conmutar muchos transistores a la vez, provocarían bajadas de tensión que harían perder fiabilidad a los componentes. El regulador de voltaje es el encargado de proporcionar esos valores de tensión continua fijos (= estables) que necesitan esos componentes.
+m) Transparencia 26. Un banco de memoria es una agrupación de módulos de memoria que se comunican con la CPU a través de un MISMO canal de memoria. Para que esta respuesta esté correcta, se debe dejar claro que la CPU no podrá acceder simultáneamente al contenido de dos módulos que estén en el mismo banco de memoria.
+n) Transparencia 46. Los más habituales son: varios conectores de Ethernet (y no solo uno), varios conectores USB y un conector de vídeo de bajas prestaciones (VGA).
+
+5.- Del enunciado sé:
+T=7 días.
+Dcpu=1,2s.
+Ussd=0,6.
+Vssd=100.
+Cssd=20*10^6.
+a)
+R0min=Dcpu+Dssd.
+Hay que calcular Dssd. Una posible forma de hacerlo:
+Dssd=Bssd/C0 --> Necesito calcular Bssd y C0:
+Ussd=Bssd/T --> Bssd=Ussd*T
+Vssd=Cssd/C0 --> C0=Cssd/Vssd
+De ahí obtengo que Dssd=1,8s y R0min=3,0s (mucho ojo con no poner las unidades al resultado final, que resta 0,25 puntos).
+b) El cuello de botella es el dispositivo con mayor utilización o, equivalentemente, mayor demanda de servicio. En este caso, la unidad SSD. Por tanto:
+X0max=1/Db=0,55 tr/s. Por tanto, se saturará a partir de una tasa media de llegada de 0,55 tr/s (mucho ojo con no poner las unidades al resultado final, que resta 0,25 puntos).
+Para ver si está saturado, basta indicar que como el cuello de botella es la unidad SSD y su utilización es de 0,6 (es decir, menor que 1), el servidor no está saturado (el resto de dispositivos, por definición de cuello de botella, tendrán una utilización menor que el cuello de botella y, por tanto, también menor que 1).
+Otra forma de demostrarlo consiste en calcular la tasa de llegada actual al servidor (0,33 tr/s) y hacer notar que es menor que X0max (0,55 tr/s).
+
+6.- Transparencia 50 del tema 5. Algunos, de forma incomprensible, hablan de X0max en la demostración (e incluso de NT*), lo cual no tiene ningún sentido ya que para baja carga la productividad media obviamente será baja y, por tanto, muy alejada de su valor máximo.

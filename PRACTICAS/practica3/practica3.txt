@@ -1,0 +1,44 @@
+
+juanka
+poco tipo test 
+que parametros modifica zabit en el agente 
+y luego el servidor
+el puerto de escucha de zabit
+el nombre de 5 monitores
+porque es necesario la pila lan en zabit
+donde guarda informacion zabit (algo raro).
+los pasos para recuperar el disco del raid1 (cuando lo quitas)
+conectarte a zabit sin pasar por frontend
+los pasos para añadir un template de monitorizacion 
+
+
+
+los comandos who, last , un ejemplo de un fichero crontab y tienes q saber interpretarlo en plan a q hora se ejecuta q mes q dia etc
+algunas obvias de archivos de conf de zabbix . Tb el zabbix get,
+Mierdas del systemctl
+
+Parámetros qué módica zabbix en el servidor y otra igual pero en el agente
+Cómo obtener datos sin pasar por el frontend
+Esta pregunta fue una putada, porque nos puso ...-get...
+..._get...
+Es con _
+Que hay que modificar para acceder al frotend
+Qué significa [2/1][U_]
+Comando para obtener información del raid
+
+
+Mdadm arrancar RAID --run
+Netdata para obtener metricas
+Cosas que se ha configurado en CENTOS en ZABBIX AGENT
+Nombra 4 monitores
+Lm-sensors que es y por que no lo hemos utilizado
+Item para obtener datos ssh en ZABBIX
+Pon los pasos a seguir para reemplazar el RAID y ponerlo en marcha como en practicas
+Ficheros para configurar
+Mdadm faulty
+Que pasa al monitorizar muchos nodos (ansible)
+
+
+
+
+

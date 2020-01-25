@@ -1,0 +1,556 @@
+﻿grub-install dev/sda o sdb
+shutdown -h now     //-h human understandable
+
+CENTOS
+se trabajará con :
+-LV
+-VG
+-PV
+
+
+lsblk (list block)
+df -h (display free) 
+du    (display used)
+lvmdiskscan  (logical volume disk scan)
+lvs         (logical volume s...)
+lvdisplay
+
+
+lo mismo con vg y con pv.
+
+pvcreate y vgextend, lvcreate
+
+
+1.10 parte dificil
+
+1) Asignar el sistema de ficheros -> mkfs make filesystem  /dev/VG/LV o /dev/mapper/VG-LV, en nuestro caso /dev/cl/newvar o /dev/mapper/cl-newvar
+2) Crear un directorio (/media/newvar) y montar el LV
+!!!!!Nos hemos quedado aquí!!!!! -> 3) Copiar el antiguo /var al nuevo LV *
+4) Montar el LV en /var
+5) Liberar información del antiguo /var *
+
+
+
+mkfs.ext4 -b (establece el tamaño de bloque)
+
+man = amigo
+
+system control para echar a gente del servidor, y decir que estas de mantenimiento
+systemctl status
+systemctl isolate runlevel1.targer BUSCAR y además RAID5 y RAID6
+SELinux seguridad mejorada de linux.
+cp el contexto no se respeta.
+Por tanto hay que copiar los archivos y actualizar su contexto.
+No eliminar el antiguo old.
+restorecon -> restaurar contexto para los nuevos archivos
+restorecon -Rv /var -> copiar los contextos o restaurarlos
+bug de linux, despues de restorecon hay que hacer "mount -a"
+
+VI -> 
+i-> insert
+a-> add
+esc + :q! -> salir sin guardar
+esc + :wq -> salir guardando      
+
+----------------------------------------------------------------------
+Añadir un sdc que quiere que esté cifrado y una RAID
+
+con dos discos pequeños, del mismo tamaño para no perder
+
+Crear una raid en linea de comandos en centos:
+    -mdadm (necesita ser instalados) yum install mdadm con su. con un error (multi device admin)
+    -ifup enp0s3 una forma de "subir" la red
+    o
+    -dhclient modificar la variable boot
+
+    
+mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sdb /dev/sdc
+
+pvcreate /dev/md0
+
+vgcreate pmraid1 /dev/md0
+lvcreate -L 1G -n newvar pmraid1
+
+mkfs -t ext4 (el volumen logico /dev/mapper) /dev/mapper/pmraid1-newvar 
+
+systemctl ISOLATE runlevel1.target
+
+mkdir /mnt/newvar
+
+mount /dev/mapper/pmraid1-newvar /mnt/newvar/ (comprobar si esta)
+
+cp -r --preserve=all /var/. /mnt/newvar/
+cp /etc/fstab /etc/fstab.original
+echo 'dev/mapper/pmraid1-newvar /var ext4 defaults 0 0' >> /etc/fstab
+
+umount /mnt/newvar
+
+mv /var /varold
+mkdir /var
+ls -Z /var
+restorecon /var
+si no muestra nada hay que mount -a
+CREAR SNAPSHOT
+Eliminar uno de los discos y arrancamos, si arranca es que está hecho bien 
+
+
+
+
+-------------------------------------CIFRADO----------------------------
+
+LEVANTAR INTERFAZ DE RED ifup enp0s3
+yum install -y cryptsetup
+
+
+systemctl runlevel1.target
+LUKS Linux Unified Key Setup
+
+    LVM on LUKS = ciframos solamente el dispositivo que pretendemos utilizar en el caso que estamos tratando ahora mismo sería md0
+    LUKS on LVM
+
+
+Crear una nueva carpeta para almacenar todo temporalmente
+mkdir /varRAID
+cp -r --preserve=all /var/. /varRAID/
+
+La diferencia es que * no copia los ocultos y . si los copia
+
+
+umount /var
+mount var|gre var
+unalias cp
+cp -r --preserve=context(o all) /varRAID/. /var
+
+----ENCRIPTAR----
+
+cryptsetup luksFormat /dev/mapper/pmraid1-newvar -> PEDIRA CONTRASEÑA PARA ENCRIPTAR
+cryptsetup luksOpen /dev/mapper/pmraid1-newvar pmraid1-newvar-crypt
+lsblk
+mkfs -t ext4 /dev/pmraid1/newvar_crypt
+mkdir /mnt/varCifr
+mount /dev/mapper/pmraid1-newvar /mnt/varCifr
+cp -r --preserve=all /varRAID/. /mnt/varCifr
+
+Igual que fstab hay un fichero /etc/crypttab donde aparecera los dipositivos montados cifrados
+blkid muestra el UUID
+blkid | grep crypto >> /etc/crypttab FORMA ELEGANTE DE HACERLO
+cryptsetup luksUUID /dev/mapper/pmraid1-newvar
+vi /etc/crypttab en una nueva linea
+pmraid1-newvar_crypt    UUID=.. none
+vi /etc/fstab
+/dev/mapper/pmraid1-newvar_crypt /var ext4 defaults 0 0
+
+Ubuntu Server: editar el archivo /etc/network/interfaces y añadimos:
+auto enp0s8
+iface enp0s8 inet static
+address 192.168.56.105
+
+CentOS: Añadimos un nuevo archivo (script) a /etc/sysconfig/network-scripts con
+el nombre ifcfg-enp0s8 (tras saber que nuestra interfaz está ahí resultado de ejecutar
+lspci | grep Ether ) con el siguiente contenido:
+TYPE=Ethernet
+BOOTPROTO=none
+NAME= enp0s8
+DEVICE= enp0s8
+ONBOOT = yes
+IPADDR = 192.168.56.110
+NETMASK=255.255.255.0
+
+
+-------------------------------------Practica 2_3-------------------------------
+
+IP:Puerto = direccion del ordenador
+
+ssh = secure share, sucesor de telnet. Protocolo de comunicación encriptada, por un canal no seguro, pero los datos estan encriptados.
+Se usa mucho porque se puede conectar de forma remota.
+CentOS es mas estricto, Ubuntu no con el ssh. Por defecto el puerto de ssh es el 22
+d es de demonio o servicio, entonces el d es con los servidores.
+
+después de instalar openssh-servidor
+
+
+ssh localhost para establecer conexion con nosotros
+fingerprint = codigo hash que permite identificar inequivocamente con una maquina.
+ssh gbv@localhost , hay que recordar no ser super usuario porque si no no puedes hacer ssh localhost.
+
+Abrir PuTTY y hacer ssh 192.168.56.105 -l gbv (para Ubuntu)
+ssh 192.168.56.110 -l gbv (para CentOS)
+ssh gbv@192.168.56.110 tambien
+
+los fingerprints estan: .ssh/known_hosts en el /home
+
+systemctl status sshd.service para monitorizar
+
+ESQUEMA PAPEL
+
+
+Es portante saber los ficheros de configuracion
+etc/network/interfaces por ejemplo
+
+forzar al usuario no ser root
+
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup (Servidor)
+
+vi /etc/ssh/sshd_config
+
+[...]
+#Authenticaiton:
+
+PermitRootLogin no
+
+Hay que reiniciar el servicio
+
+systemctl restart sshd
+
+En PuTTY
+hacemos ssh 192.168.56.105 y no nos podriamos conectar
+
+
+
+-----------------CAMBIAR EL PUERTO-----------------------------
+vi /etc/ssh/sshd_config
+Port 22022
+
+systemctl restart sshd
+
+ssh 192.168.56.105 -l gbv -p 22022
+
+
+
+En CentOS
+-------------- ACCESOS SIN CONTRASEÑA -------------------------
+Hay dos archivos id_rsa y id_rsa.pub 
+
+La clave publica es el candado
+Y la privada es la llave.
+
+ssh-keygen 
+Introducir el path donde se guarda
+passphrase como semilla
+No pondriamos ninguna
+
+Y nos ha creado el .ssh
+
+COPIAR AL SERVIDOR LA CLAVE publica
+ssh-copy-id <ip_servidor> -p 22022
+ssh-copy-id 192.168.56.105 -p 22022
+
+se ha copiado id_rsa.pub (el .pub es de public)
+
+ssh 192.168.56.105 -l gbv -p 22022
+
+-----------------------DIFERENCIAS SSHD ---------------------------------------------------------------------------------------
+        Instalacion            Nomeclatura                             Comentado               Acceso ROOT          Firewall
+Ubuntu  no viene instalado     sshd y ssh para servers                 No hay sobrecargas      prohibit_password    NO
+CentOS  si viene instalado     sshd para servidores                    Si hay sobrecargas(#)   si                   SI
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+CentOS
+
+sed reemplazar texto
+
+sed -e "s/#Port 22/Port 22022/" -i PATH
+
+ifup enp0s3
+yum search semanage
+yum provides semanage
+yum install policycoreutils -----------> EL BUENO ----- yum install policycoreutils-python
+semanage port -l | grep ssh
+semanage port -a -t ssh_port_t -p tcp 22022 CAMBIA AL PUERTO 22022
+systemctl restart sshd
+systemctl status sshd
+No se puede conectar a traves de 22022
+
+Ubuntu ufw
+
+ufw enable
+ufw allow 22022 
+
+
+CentOS firewall-cmd
+
+firewall-cmd --state --> Running
+firewall-cmd --add-port=22022/tcp --permanent
+firewall-cmd --reload
+
+--------------------------------------
+
+firewall-cmd --add-port=22022/tcp
+firewall-cmd --add-port=22022/tcp --permanent
+
+
+Se reinicia el ordenador...
+
+Hay que añadirlo permanentemente en el firewall
+
+
+firewall-cmd --reload
+
+
+----------------------------------P2_Sesion 3----------------------------
+
+Hipertexto: Hipervinculo y enlaza a documentos o en el propio documento.
+HTTP: HyperText Transfer Protocol
+URI: Uniform Resource Identifier
+URL: Uniform Resource Locator 
+Servidor web: (Servidor) Dispositivo que recibe peticiones y las responde. 
+El medio que se utiliza es Internet, en este caso en la web.
+LAMP definicion
+L: Linux 
+A: APache
+M: MariaDB
+P: PhP o Pythonp
+PHP o Python: Al ser interpretado no hace falta ser compilado. Cuestiones de tiempo
+
+
+
+Stack, pila software = LAMP.
+
+Espacio que ocupa LAMP en Ubuntu
+Espacio que ocupa LAMP en CEntos
+
+tasksel con LAMP
+systemctl status apache2. Esta funcionando
+php -a :Fundciona
+mysql -u root -p
+---------------------------------------------------------------------------
+CENTOS
+---------------------------------------------------------------------------
+Buscar apache2
+yum install httpd
+httpd esta deshabilitado e inactivo
+systemctl status httpd
+yum install php y se comprueba con php -a
+yum install mariadb-server -y
+HAY QUE ACTIVARLO CON SYSTEMCTL
+mysql -u root -p
+mysql_secure_installation (Crear contraseña para root)
+acceder por ssh con PuTTY
+acceder a /var/www/html y poner el script:
+
+<?php
+$enlace = mysqli_connect("127.0.0.1", "mi_usuario", "mi_contraseña", "mi_bd");
+
+if (!$enlace) {
+    echo "Error: No se pudo conectar a MySQL." . PHP_EOL;
+    echo "errno de depuración: " . mysqli_connect_errno() . PHP_EOL;
+    echo "error de depuración: " . mysqli_connect_error() . PHP_EOL;
+    exit;
+}
+
+echo "Éxito: Se realizó una conexión apropiada a MySQL! La base de datos mi_bd es genial." . PHP_EOL;
+echo "Información del host: " . mysqli_get_host_info($enlace) . PHP_EOL;
+
+mysqli_close($enlace);
+?>
+
+Cambiar usuario y contraseña
+
+Pero no funciona.
+
+curl localhost/miscript.php en el CENTOS
+y funciona, asi que es resolver la peticion.
+Es el cortafuegos, hay que añadir el puerto 80
+Pero solo vemos el archivo, entonces queremos que el interprete
+lea el script y nos de el resultado
+cd /etc/httpd/conf/ archivo httpd.conf
+DirectoryIndex miscript.php o *.php
+Pero da error porque no esta el modulo que conecte php con mysql
+yum install php-mysql
+Pero no funciona por el SELinux
+getsebool -a | grep httpd
+httpd_can_network_connect_db --> ON deberia estar on.
+
+setsebool -P (permanente) httpd_can_network_connect_db on
+
+Funciona el servidor LAMP
+
+FAIL2BAN
+
+
+yum install epel-release -y
+yum install fail2ban
+systemctl enable fail2ban
+systemctl start fail2ban
+ficheros en /etc/fail2ban
+jail.conf --> Archivo de configuracion de carceles
+jail.local --> Archivo experimental
+Despues de 5 intentos fallidos banea
+hay que cambiar el puerto en el jail.local
+
+
+
+ps-u ver procesos
+
+SCREEN
+yum install screen
+screen y abre una ventana de screen que es lo mismo
+y para abrir de nuevo algo que se quedado cogado
+screen -list
+screen -r <numero de lista>
+
+tmux tambien
+RootKitHunter
+RKHunter
+
+---------------------------------Practica 3------------------------------------------
+
+
+TUTORIAL ZABBIX:
+
+https://clouding.io/kb/como-instalar-y-configurar-zabbix/
+
+
+
+
+--------------------------------RAID 1-----------------------------------------------
+install boot-info-cript
+bootinfocript resultados.txt
+grub-install /dev/sdb
+bootinfocript resultados.txt
+
+Y ahora si esta instalado en el sdb
+Y sigue funcionando
+
+Y ahora sale el error de lvmetad
+Y sale el initramfs
+
+dmesg
+cat /proc/mdstat
+https://raid.wiki.kernel.org/index.php/Mdstat
+
+Lineas de niveles RAIDS soportados Personalities
+
+
+-----------BONUS------------------
+El RAID ha muerto basicamente entonces, hay que parar el RAID y volver a ensamblarlo.
+
+mdadm --run /dev/md0
+
+Solución alternativa:
+mdadm --stop /dev/md0
+mdadm --assemble --scan
+Link a la solución:
+https://superuser.com/questions/603481/how-do-i-reactivate-my-mdadm-raid5-array
+
+
+---------OTRO_BONUS------------------
+Hay que fijarse en el [U_]
+Entonces hay que borrar ese disco
+PERO NO HACER HASTA QUE DIGA EL PROFESOR
+
+mdadm --manage /dev/md0 -r /dev/sdb
+
+Link a la solución:
+https://www.thomas-krenn.com/en/wiki/Mdadm_recovery_and_resync
+
+
+---------OTRO_BONUS_2----------------
+Y para añadirlo de nuevo:
+
+mdadm --manage /dev/md0 -a /dev/sdb
+
+----------O-------------------------
+
+mdadm --add /dev/md0 /dev/sdb
+
+mismo link que OTRO_BONUS
+
+mdadm --detail /dev/md0
+
+mdadm --examine /dev/sda
+mdadm --examine /dev/sdb
+
+mdadm --monitor --scan --mail CORREO
+
+modo faulty para probar
+sudo mdadm --manage --set-faulty /dev/md0 /dev/sdb
+
+cat /proc/mdstat
+
+mdadm --manage /dev/md0 -r /dev/sdb
+mdadm --manage /dev/md0 -a /dev/sdb
+
+ES instantanea la recuperacion del RAID --> NO
+
+Para ver como se replica se hace con el comando
+watch -n 2 cat /proc/mdstat
+
+Crear el mon-raid.service en /etc/systemd/system
+VER PDF
+
+Y los timer, cada cuanto se va a ejecutar
+mon-raid.timer
+
+systemctl enable mon-raid.timer
+systemctl start mon-raid.timer
+
+journalctl -u lo que viene en el pdf
+
+------------ANSIBLE---------------------------
+
+Configurar /etc/ansible/hosts
+ansible grupo -m comando
+
+----------------------------------------------
+
+-----------ZABBIX TUTO------------------------
+
+https://www.zabbix.com/documentation/3.4/manual/installation/install_from_packages/debian_ubuntu
+
+
+
+
+-----------------------------------BIBLIOGRAFIA---------------------------------------
+https://www.youtube.com/watch?v=O8gRDfuSHzg
+http://yallalabs.com/linux/how-to-install-zabbix-3-4-monitoring-server-on-ubuntu-16-04-lts/
+https://www.zabbix.com/documentation/3.4/manual/installation/install_from_packages/debian_ubuntu
+https://clouding.io/kb/como-instalar-y-configurar-zabbix/
+https://www.zabbix.com/forum/zabbix-help/355372-create-sql-gz-no-such-file-or-directory
+https://www.zabbix.com/documentation/4.0/manual/installation/install_from_packages/debian_ubuntu#importing_data
+https://www.zabbix.com/download?zabbix=3.4&os_distribution=ubuntu&os_version=xenial&db=MySQL
+https://community.nethserver.org/t/howto-install-zabbix-3-4/7841
+https://www.digitalocean.com/community/tutorials/how-to-import-and-export-databases-in-mysql-or-mariadb
+
+------------------------------------------CENTOS--------------------------------------
+Error al instalar porque habia ya una version, la 3.0
+https://www.rosehosting.com/blog/how-to-install-zabbix-3-4-server-on-centos-7/
+
+
+PARA AGREGARLO A SELINUX CUANDO DA ERROR
+ausearch -c 'zabbix_agentd' --raw | audit2allow -M my-zabbixagentd
+semodule -i my-zabbixagentd.pp
+
+https://mangolassi.it/topic/10373/install-zabbix-on-centos-7/2
+
+firewall-cmd --add-port=10050/tcp --permanent
+firewall-cmd --reload
+setsebool -P zabbix_can_network 1
+setsebool -P httpd_can_connect_zabbix 1
+
+
+https://blog.desdelinux.net/zabbix-3-servicio-de-supervision-y-monitoreo/
+https://www.youtube.com/watch?v=OXvIUWelQlA
+https://www.zabbix.com/forum/zabbix-help/25771-ssh-not-running-non-standard-port-configuration
+https://www.youtube.com/watch?v=vY6Kb_lkTRY
+
+
+
+
+------------------------PRACTICA 4----------------------------------------------------------
+Para examen:
+
+Phoronix cómo instalar
+ list-available-test
+ benchmark 
+ phoromatic
+
+ab y Jmeter:
+ ab -m (personalizacion del test) -c (concurrencia, por defecto = 1) 192.168.56.110
+ digitalocean docker installation
+
+ Si da problema
+ docker pull <imAGEN>
+ docker run ...
+ docker-compose es configurador masivo de dockers

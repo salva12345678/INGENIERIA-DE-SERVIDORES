@@ -1,0 +1,26 @@
+preguntas practica 2
+
+
+Ise
+Cómo iniciar git
+Segundo examen de prácticas
+
+
+Apuntante como importantes que caen siempre:
+Que hace git diff, que significan las opciones de rsync -aviz
+Y fail2ban si te puedes conectar al puerto ssh por defecto cuando has sido baneado, la respuesta es si porque en las practicas cambias de puerto
+Las demas se sacan con lo que das en clase
+
+
+
+Me han entrado lo que tu me has dicho
+las preguntas
+incluso alguna su¡obre el apache2 en centos , que si esta habilitado o inicializado
+Pregunto que significaba rkhunter
+Como iniciabas git, como veias el estado del repositorio
+Seleccionar el comando semanage que estaba bien
+Y cosas del estilo de configuracion
+tu me has dicho
+ME DIJERON:
+sincronizar con rsync en diferentes ordenadores, con la opcion -e
+CentOS y UBuntu tienen instalado firewall, Ubuntu no tiene por defecto inicializado y CentOS si

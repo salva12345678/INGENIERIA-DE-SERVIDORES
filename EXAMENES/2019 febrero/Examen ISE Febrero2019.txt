@@ -1,0 +1,92 @@
+1.-
+a) F. En todo caso, tendrán menor latencia.
+b) F. En la normativa se indica que no harán referencia a una fabricación o una procedencia determinada con la finalidad de favorecer o descartar ciertas empresas o ciertos productos. Si no es posible, se acompañará la mención «o equivalente». Por tanto, no lo prohíbe.
+c) V. Transparencia 6 del tema 2.
+d) V. N0=N1+N2+…+Nk. Transparencia 28 del tema 5.
+e) V. Por eso han aparecido en el mercado las alternativas basadas en PCIe x4 (transparencia 40 del tema 2).
+f) F. Deben figurar obligatoriamente en todos los pliegos de cláusulas administrativas particulares (transparencia 15 del tema 6) pero no en el pliego de prescripciones técnicas.
+g) F. Es algo evidente que la red forma una parte fundamental de un servidor por lo que en los paneles traseros suele haber varios conectores de red y de altas prestaciones (aparte, puede haber otro conector de red de menores prestaciones para la administración del servidor).
+h) F. Fexp no es lo mismo que el valor-p. Ver última transparencia del tema 4.
+i) F. Se va obteniendo información de la utilización del procesador que haya sido recopilada desde las 0:00 del día actual hasta el momento en el que se ejecuta la orden.
+j) F. Ver transparencia 52 del tema 2. La RAM no es un "periférico con bajas exigencias de velocidad".
+k) F. D es la suma de todas las demandas de servicio y, por tanto, un valor mayor que Db. Por lo tanto, 1/D < 1/Db y puede ocurrir que X0 sea mayor que 1/D y menor que 1/Db (que sería el límite máximo que X0 podría alcanzar).
+l) V. Transparencia 16 del tema 2.
+m) V. Transparencia 19 del tema 2.
+n) V. Es el resultado de aplicar la Ley de Little a la cola de una estación de servicio. Transparencia 33 del tema 5.
+o) F. El servidor se satura cuando lo haga el cuello de botella, es decir, cuando alguna de las utilizaciones de los componentes del servidor sea igual a 1 y no cuando la suma de todas las utilizaciones sea mayor que 1. Transparencia 42 del tema 5. Sin ir más lejos, en el ejercicio 5 del mismo examen, la suma de utilizaciones es mayor que 1 y el servidor no está saturado.
+
+2.- Existen muchas formas de resolverlo. Una de ellas:
+Si llamo fm a la solución --> Tm=(1-fm)*Tm + fm*Tm --> To=(1-fm)*Tm + fm*Tm*k.
+Como conozco To, Tm y k (=1,4), solo tengo que despejar fm y obtengo: fm=0,48.
+
+Fallos muy comunes que he detectado (todos ellos graves):
+a) No ser capaces de razonar que k=1,4.
+b) Decir que la solución es la "f" de S=To/Tm=1/(1-f+f/k) --> f=0,56. Pero esa f es la fracción de To en la que se usa el subsistema de discos y NO LA FRACCIÓN DE Tm en la que se usa el subsistema de discos. En ese caso, habría que de ahí deducir que Tdiscos=f*To --> Tdiscos mejorado = f*To/k y fm=Tdiscos_mejorado/Tm= 0,48.
+
+3.- Se debe deducir que:
+main llama de media 2 veces a reduce
+reduce llama de media 3 veces a invierte
+invierte llama de media 4 veces a calcula
+
+Es fácil, a partir de esa información determinar que:
+total s/call de invierte =  self s/call de invierte + 4*total s/call de calcula = 2+4*0,2 = 2,8s.
+Por tanto, total s/call de reduce = self s/call de reduce + 3*total s/call de invierte = 8+3*2,8 = 16,4s.
+
+4.-
+a)
+Pr.      Ref (s)   A (s)      B (s)      Ref/A    Ref/B
+P1      1200      300      250        4,00      4,80
+P2      2400      900      1200      2,67      2,00
+P3      3600      700      1200      5,14      3,00
+P4      1200      600      1000      2,00      1,20
+SPEC_A=(4*2,67*5,14*2)^(1/4) = 3,24
+SPEC_B=(4,8*2*3*1,2)^(1/4) = 2,42
+El índice SPEC es un índice que cuanto mayor sea mejor (ya que es la media geométrica de las ganancias en velocidad con respecto a una máquina de referencia). Así que, según ese índice, la máquina A es más rápida que la B (su índice SPEC el mayor).
+
+b) Ver, por ejemplo, la última transparencia del tema 4. La hipótesis de partida (H0) es que los rendimientos de ambas máquinas son equivalentes.
+Se debe calcular texp=-2,4.
+Para descartar H0 para un nivel de confianza del 95% (alfa=0,05), texp debería estar fuera del rango [-3,18, 3,18] (ya que alfa/2 = 0,025 y "n-1" = 3). Como está dentro de dicho rango, no podemos rechazar H0.
+
+5.- Me dan lambda0, Si y Ui. Conviene expresar Si en segundos y Ui en "tanto por uno":
+Dispositivo   Si (s)   Ui
+CPU               0,01    0,32
+Disco A         0,04    0,64
+Disco B         0,03    0,36
+a) Es obvio que el servidor no está saturado ya que ninguna utilización llega a 1. Por tanto X0=lambda0. A partir de Ui=X0*Di puedo obtener las demandas de servicio. A partir de Di=Vi*Si puedo obtener las razones de visita.
+Solución:
+Dispositivo   Di (s)   Vi
+CPU               0,08    8
+Disco A         0,16    4
+Disco B         0,09    3
+b) Al no estar saturado, Ui=lambda0*Di. El dispositivo cuello de botella es el que tiene mayor utilización o, como lambda0 se multiplica a todos por igual, la mayor demanda de servicio de forma independiente a la tasa de llegadas. Por lo tanto, ésta no afecta a la determinación del cuello de botella (también conviene hacer notar que Di=Vi*Si y ninguna de esas variables operacionales vienen afectadas por la tasa de llegadas).
+c) El cuello de botella actualmente es el Disco A ya que es el de mayor utilización (o mayor demanda de servicio). Por tanto Db=D_DiscoA=0,16s.
+X0max=1/Db = 1/0,16 = 6,25 tr/s.
+Podría pensarse que se podría conseguir doblar X0max actuando únicamente sobre el tiempo de servicio del DiscoA (haciendo que valga la mitad), pero eso haría que el cuello de botella dejase de ser el DiscoA para pasar a ser el DiscoB. Es el DiscoB el que entonces limitaría la productividad máxima y ésta nunca podría superar los 11,1 tr/s.
+d) Antes del cambio tenemos:
+R0min=0,08+0,16+0,09=0,33s
+X0max=6,25tr/s
+Tras el cambio, todos los accesos al DiscoA tendrían que ir al DiscoB por lo que habría que justificar que ahora la razón de visita del DiscoB pasaría a ser 4+3=7. En ese caso, tendríamos:
+Dispositivo   Si (s)   Vi
+CPU               0,01    8
+Disco B         0,03    7
+por lo que:
+R0min=0,08+0,21=0,29s (hay una mejora de 0,04s con respecto el valor anterior).
+X0max=1/0,21=4,76tr/s (en este caso, hay un claro empeoramiento: el sistema se satura mucho antes).
+Muchos han contestado esta pregunta diciendo que la utilización del DiscoB ahora pasaría a ser 0,64+0,36=1. Eso no tiene ningún sentido y es incorrecto.
+e) Se debe seguir la transparencia 66 del tema 5 y, finalmente, utilizar que Ui=X0*Di=lambda0*Di (si no saturado) para llegar a que Ri=Si/(1-Ui). También habría que indicar explícitamente todas las leyes que se han utilizado: Ley de Little: Ni=lambdai*Ri y Ley del flujo forzado: Xi=X0*Vi=lambda0*Vi (si no saturado).
+
+6.-
+a) Son ranuras para conectar módulos de DRAM. Conexión half-duplex con la CPU.
+b) Transparencia 68 del tema 4. Factor: Cada una de las variables que pueden afectar a la variable respuesta. Nivel: Cada uno de los valores que puede asumir un factor.
+c) Transparencia 44 del tema 2. En el caso de PCIe 3.0, la codificación es 128b/130b por lo que APENAS hay overhead en la transmisión y prácticamente TODOS los bits transmitidos son de información.
+d) Transparencia 51 del tema 3.
+e) Transparencias 26 y 27 del tema 2. Un banco de memoria es una agrupación de módulos de memoria que se comunican con la CPU a través de un mismo canal de memoria. Cada módulo de memoria está, a su vez, distribuido en rangos de memoria que no son más que agrupaciones de chips que me proporcionan una palabra completa de 64 bits (72 bits en caso de memorias ECC). Por lo tanto, un rango de memoria es como si tuviéramos un "sub-banco de memoria" dentro del propio módulo de memoria.
+f) Transparencias 23 y 24 del tema 1. El hot-swapping consiste en el intercambio de componentes (normalmente periféricos pero incluso puede tratarse de fuentes de alimentación) sin necesidad de apagar el computador o tener que reiniciarlo. Evidentemente, esto reduce el tiempo en el que el computador debe estar no operativo debido a ese intercambio y, por tanto, hace que mejore su disponibilidad.
+g) Transparencia 30 del tema 1.
+h) Transparencias 25 y 27 del tema 2 (y 24 del tema 1). ECC viene de "Error Correcting Code". Son módulos de memoria DRAM que incorporan bits redundantes (8 bits por cada 64) para poder detectar y corregir errores de lectura. Eso hace que sean más fiables ya que disminuye la probabilidad de que haya un error en la lectura del dato de memoria.
+i) Transparencia 22 del tema 2.
+SRAM tiene menor latencia que DRAM.
+SRAM tiene mayor coste por bit que DRAM.
+SRAM no necesita refresco (sí lo necesita DRAM).
+SRAM se suele encontrar formando las cachés dentro del micro y la DRAM suele estar fuera, pinchada en la placa.
+Ojo, ambas son memorias volátiles por lo que decir eso sería una respuesta incorrecta.
